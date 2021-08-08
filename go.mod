@@ -1,4 +1,4 @@
-module github.com/Jleagle/zaprollbar
+module github.com/Jleagle/zap-rollbar
 
 go 1.16
 
