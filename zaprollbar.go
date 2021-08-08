@@ -1,6 +1,7 @@
 package zaprollbar
 
 import (
+	"errors"
 	"io"
 
 	"github.com/rollbar/rollbar-go"
@@ -8,7 +9,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func NewCore(token, environment, codeVersion, serverHost, serverRoot string, sync bool) *rollbarCore {
+func NewCore(token, environment, codeVersion, serverHost, serverRoot string, sync bool) (*rollbarCore, error) {
+
+	if token == "" {
+		return nil, errors.New("invalid token")
+	}
 
 	rollbar.SetToken(token)
 
@@ -23,7 +28,7 @@ func NewCore(token, environment, codeVersion, serverHost, serverRoot string, syn
 		core.client = rollbar.NewAsync(token, environment, codeVersion, serverHost, serverRoot)
 	}
 
-	return core
+	return core, nil
 }
 
 type rollbarCore struct {
