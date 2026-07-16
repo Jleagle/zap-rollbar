@@ -69,11 +69,18 @@ func WithClient(client *rollbar.Client) Option {
 	}
 }
 
+// WithItemsPerMinute sets the maximum number of items to send to Rollbar in a given minute.
+func WithItemsPerMinute(itemsPerMinute int) Option {
+	return func(c *rollbarCore) {
+		c.client.SetItemsPerMinute(itemsPerMinute)
+	}
+}
+
 // NewCore creates a new zapcore.Core that sends logs to Rollbar.
 func NewCore(token string, opts ...Option) zapcore.Core {
-	client := rollbar.NewAsync(token, "production", "", "", "")
+
 	core := &rollbarCore{
-		client:   client,
+		client:   rollbar.NewAsync(token, "production", "", "", ""),
 		minLevel: zapcore.WarnLevel,
 		fields:   make(map[string]interface{}),
 	}

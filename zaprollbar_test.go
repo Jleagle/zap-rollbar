@@ -52,3 +52,10 @@ func TestEnabled(t *testing.T) {
 		t.Error("expected FatalLevel to be enabled")
 	}
 }
+
+func TestWithItemsPerMinute(t *testing.T) {
+	core := NewCore("token", WithItemsPerMinute(50))
+	if core == nil {
+		t.Fatal("expected core to be non-nil")
+	}
+}
