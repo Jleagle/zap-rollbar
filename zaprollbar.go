@@ -16,44 +16,6 @@ type rollbarCore struct {
 // Option defines a functional option for NewCore.
 type Option func(*rollbarCore)
 
-// WithEnvironment sets the Rollbar environment.
-func WithEnvironment(env string) Option {
-	return func(c *rollbarCore) {
-		c.client.SetEnvironment(env)
-	}
-}
-
-// WithCodeVersion sets the Rollbar code version.
-func WithCodeVersion(version string) Option {
-	return func(c *rollbarCore) {
-		c.client.SetCodeVersion(version)
-	}
-}
-
-// WithServerHost sets the Rollbar server host.
-func WithServerHost(host string) Option {
-	return func(c *rollbarCore) {
-		c.client.SetServerHost(host)
-	}
-}
-
-// WithServerRoot sets the Rollbar server root.
-func WithServerRoot(root string) Option {
-	return func(c *rollbarCore) {
-		c.client.SetServerRoot(root)
-	}
-}
-
-// WithSync sets whether to use synchronous Rollbar client.
-// By default, an asynchronous client is used.
-func WithSync(sync bool) Option {
-	return func(c *rollbarCore) {
-		if sync {
-			c.client = rollbar.NewSync(c.client.Token(), c.client.Environment(), c.client.CodeVersion(), c.client.ServerHost(), c.client.ServerRoot())
-		}
-	}
-}
-
 // WithMinLevel sets the minimum log level to send to Rollbar.
 // Defaults to WarnLevel.
 func WithMinLevel(level zapcore.Level) Option {
@@ -62,25 +24,10 @@ func WithMinLevel(level zapcore.Level) Option {
 	}
 }
 
-// WithClient allows providing a custom Rollbar client.
-func WithClient(client *rollbar.Client) Option {
-	return func(c *rollbarCore) {
-		c.client = client
-	}
-}
-
-// WithItemsPerMinute sets the maximum number of items to send to Rollbar in a given minute.
-func WithItemsPerMinute(itemsPerMinute int) Option {
-	return func(c *rollbarCore) {
-		c.client.SetItemsPerMinute(itemsPerMinute)
-	}
-}
-
-// NewCore creates a new zapcore.Core that sends logs to Rollbar.
-func NewCore(token string, opts ...Option) zapcore.Core {
-
+// NewCore creates a new zapcore.Core that sends logs to Rollbar using the provided rollbar.Client.
+func NewCore(client *rollbar.Client, opts ...Option) zapcore.Core {
 	core := &rollbarCore{
-		client:   rollbar.NewAsync(token, "production", "", "", ""),
+		client:   client,
 		minLevel: zapcore.WarnLevel,
 		fields:   make(map[string]interface{}),
 	}

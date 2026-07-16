@@ -12,13 +12,15 @@ go get github.com/Jleagle/zap-rollbar
 package main
 
 import (
-	"github.com/Jleagle/zap-rollbar"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-	core := zaprollbar.NewCore("YOUR_TOKEN", zaprollbar.WithEnvironment("production"))
+	client := rollbar.NewAsync("YOUR_TOKEN", "production", "", "", "")
+	defer client.Close()
+
+	core := zaprollbar.NewCore(client, zaprollbar.WithMinLevel(zapcore.WarnLevel))
 
 	logger := zap.New(zapcore.NewTee(
 		core,
@@ -28,4 +30,5 @@ func main() {
 
 	logger.Error("something went wrong", zap.String("foo", "bar"))
 }
+
 ```

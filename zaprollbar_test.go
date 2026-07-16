@@ -3,12 +3,14 @@ package zaprollbar
 import (
 	"testing"
 
+	"github.com/rollbar/rollbar-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 func TestNewCore(t *testing.T) {
-	core := NewCore("token", WithEnvironment("test"))
+	client := rollbar.NewAsync("token", "test", "", "", "")
+	core := NewCore(client)
 	if core == nil {
 		t.Fatal("expected core to be non-nil")
 	}
@@ -23,7 +25,8 @@ func TestNewCore(t *testing.T) {
 }
 
 func TestWith(t *testing.T) {
-	core := NewCore("token")
+	client := rollbar.NewAsync("token", "test", "", "", "")
+	core := NewCore(client)
 	newCore := core.With([]zapcore.Field{
 		zap.String("foo", "bar"),
 	})
@@ -38,7 +41,8 @@ func TestWith(t *testing.T) {
 }
 
 func TestEnabled(t *testing.T) {
-	core := NewCore("token", WithMinLevel(zapcore.ErrorLevel))
+	client := rollbar.NewAsync("token", "test", "", "", "")
+	core := NewCore(client, WithMinLevel(zapcore.ErrorLevel))
 
 	if core.Enabled(zapcore.WarnLevel) {
 		t.Error("expected WarnLevel to be disabled")
@@ -50,12 +54,5 @@ func TestEnabled(t *testing.T) {
 
 	if !core.Enabled(zapcore.FatalLevel) {
 		t.Error("expected FatalLevel to be enabled")
-	}
-}
-
-func TestWithItemsPerMinute(t *testing.T) {
-	core := NewCore("token", WithItemsPerMinute(50))
-	if core == nil {
-		t.Fatal("expected core to be non-nil")
 	}
 }
